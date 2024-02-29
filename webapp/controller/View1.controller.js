@@ -17,6 +17,7 @@ sap.ui.define(
 
       getRequests: function (oEvent) {
         this.closeMsgStrip();
+        this.openPanel(false);
 
         sap.ui.core.BusyIndicator.show(0);
         this.oModel.read("/fillTableSet", {
@@ -30,22 +31,10 @@ sap.ui.define(
           }, this),
         });
       },
-
-      getSelectedTableLine: function () {
-        try {
-          var selectedTabline = this.byId("reqTable")
-            .getSelectedItems()[0]
-            .getBindingContext("js")
-            .getObject();
-          return selectedTabline;
-        } catch (error) {
-          this.showMsgStrip(this.i18n.getText("chooseLine"), "Error");
-          return null;
-        }
-      },
       onCopyButtonPress: function (oEvent) {
         this.closeMsgStrip();
-        var selectedTabline = this.getSelectedTableLine();
+        this.openPanel(true);
+        var selectedTabline = this.getSelectedTableLine(oEvent);
         if (selectedTabline === null) {
           return;
         }
@@ -67,11 +56,10 @@ sap.ui.define(
         );
         this.jsModel.setProperty("/newEntry/reasonText", selectedTabline.reasonText);
       },
-
       onDeleteButtonPress: function (oEvent) {
+        oEvent.getSource().getParent().getParent();
         this.closeMsgStrip();
-
-        var selectedTabline = this.getSelectedTableLine();
+        var selectedTabline = this.getSelectedTableLine(oEvent);
         if (selectedTabline === null) {
           return;
         }
@@ -82,41 +70,56 @@ sap.ui.define(
           actions: [MessageBox.Action.YES, MessageBox.Action.NO],
           onClose: function (oAction) {
             if (oAction === MessageBox.Action.YES) {
-              that.deleteRequest(that, "");
+              that.deleteRequest(selectedTabline, that);
             }
           },
         });
       },
       onModifyButtonPress: function (oEvent) {
         this.closeMsgStrip();
-        this.deleteRequest(this, "X");
+        this.openPanel(true);
+        this.onCopyButtonPress(oEvent);
+        this.openModifyBtn(true);
       },
-
-      deleteRequest: function (that, commit) {
+      onModifyAction: function (oEvent) {
+        var that = this;
+        debugger;
         var selectedTabline = this.getSelectedTableLine();
-        if (selectedTabline === null) {
-          return;
-        }
-        var sPath = that.oModel.createKey("/deleteEntrySet", {
-          pernr: that.jsModel.getProperty("/pernr"),
-          startDate: selectedTabline.startDate,
-          endDate: selectedTabline.endDate,
-          subty: selectedTabline.subty,
-          seqnr: selectedTabline.seqnr,
-          commit: commit,
-        });
 
-        sap.ui.core.BusyIndicator.show(0);
-        that.oModel.remove(sPath, {
-          success: function (oData, oResponse) {
-            sap.ui.core.BusyIndicator.hide();
-            that.showMsgStrip(that.i18n.getText("successMsg"), "Success");
-            that.getRequests();
-          },
-          error: function (oError) {
-            sap.ui.core.BusyIndicator.hide();
-            that.showMsgStrip(JSON.parse(error.responseText).error.message.value, "Error");
-          },
+        this.deleteRequest(selectedTabline, that)
+          .then(function () {
+            debugger;
+            that.onAddButtonPress();
+            that.openModifyBtn(false);
+          })
+          .catch(function (error) {
+            console.error("Delete request error:", error);
+          });
+      },
+      deleteRequest: function (selectedTabline, that) {
+        return new Promise(function (resolve, reject) {
+          var sPath = that.oModel.createKey("/deleteEntrySet", {
+            pernr: that.jsModel.getProperty("/pernr"),
+            startDate: selectedTabline.startDate,
+            endDate: selectedTabline.endDate,
+            subty: selectedTabline.subty,
+            seqnr: selectedTabline.seqnr,
+          });
+
+          sap.ui.core.BusyIndicator.show(0);
+          that.oModel.remove(sPath, {
+            success: function (oData, oResponse) {
+              sap.ui.core.BusyIndicator.hide();
+              that.showMsgStrip(that.i18n.getText("successMsg"), "Success");
+              that.getRequests();
+              resolve(); // Başarıyla tamamlandığında Promise'i çöz
+            },
+            error: function (oError) {
+              sap.ui.core.BusyIndicator.hide();
+              that.showMsgStrip(JSON.parse(oError.responseText).error.message.value, "Error");
+              reject(oError); // Hata oluştuğunda Promise'i reddet
+            },
+          });
         });
       },
       valueStatesControl: function (newEntry) {
@@ -185,12 +188,28 @@ sap.ui.define(
               onClose: function (sAction) {}.bind(this),
             });
             this.getRequests();
+            this.onClearButtonPress();
           }, this),
           error: $.proxy(function (error) {
             sap.ui.core.BusyIndicator.hide();
             this.showMsgStrip(JSON.parse(error.responseText).error.message.value, "Error");
           }, this),
         });
+      },
+      getSelectedTableLine: function (oEvent) {
+        try {
+          var selectedTabline = this.jsModel.getProperty(
+            oEvent.getSource().getParent().getBindingContextPath()
+          );
+          this.jsModel.setProperty(
+            "/eventTabPath",
+            oEvent.getSource().getParent().getBindingContextPath()
+          );
+          return selectedTabline;
+        } catch (error) {
+          selectedTabline = this.jsModel.getProperty(this.jsModel.getProperty("/eventTabPath"));
+          return selectedTabline;
+        }
       },
       showMsgStrip: function (msg, msgType) {
         this.jsModel.setProperty("/message/errorMsg", msg);
@@ -233,12 +252,22 @@ sap.ui.define(
         var edmTimeObject = oTimeType.parseValue(timeString, "string");
         return edmTimeObject;
       },
-
+      openModifyBtn: function (visible) {
+        this.jsModel.setProperty("/button/mdfBtn", visible);
+        this.jsModel.setProperty("/button/addBtn", !visible);
+      },
       convertToDateObject: function (time) {
         var hours = time.ms / (1000 * 60 * 60);
-        var minutes = Math.ceil((hours - Math.floor(hours)) * 60); // Yukarıya yuvarlama işlemi
+        var minutes = Math.round((hours - Math.floor(hours)) * 60);
         // var seconds = (minutes - Math.floor(minutes)) * 60;
         return new Date(0, 0, 0, Math.floor(hours), minutes, "00");
+      },
+      visibleCnclBtn: function (visible) {
+        this.jsModel.setProperty("/button/cnclBtn", data.results);
+      },
+      openPanel: function (visible) {
+        var oPanel = this.getView().byId("pnl1");
+        oPanel.setExpanded(visible);
       },
     });
   }

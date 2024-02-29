@@ -17,5 +17,10 @@
         "errorMsg": "",
         "errorType": "Error",
         "visible": false
-    }
+    },
+    "button": { 
+        "mdfBtn": false,
+        "addBtn": true
+    },
+    "eventTabPath": ""
 }

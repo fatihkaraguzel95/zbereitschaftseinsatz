@@ -14,9 +14,9 @@ builder:
       afterTask: generateCachebusterInfo
       configuration:
         target:
-          url: http://SAPDEV1.PORTA.DE:8001
+          url: https://172.16.225.9:8201
         app:
-          name: ZBERSCHAFTSSATZ
+          name: ZHR_XSS_BEREITSCHAFT
           description: Bereitschaftseinsatz
           package: ZHR_XSS_FIORI
           transport: DHRK914574

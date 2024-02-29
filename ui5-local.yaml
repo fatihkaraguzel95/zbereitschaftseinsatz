@@ -28,10 +28,10 @@ server:
     - name: fiori-tools-proxy
       afterMiddleware: compression
       configuration:
-        ignoreCertError: false # If set to true, certificate errors will be ignored. E.g. self-signed certificates will be accepted
+        ignoreCertError: true # If set to true, certificate errors will be ignored. E.g. self-signed certificates will be accepted
         backend:
           - path: /sap
-            url: http://SAPDEV1.PORTA.DE:8001
+            url: https://172.16.225.9:8201
             client: '100'
     - name: sap-fe-mockserver
       beforeMiddleware: csp

@@ -17,7 +17,7 @@ builder:
         target:
           url: https://sapdev1.porta.de:8201
         app:
-          name: ZHR_XSS_BEREITSCHAFT
+          name: ZHR_FIO_BEREITS
           description: Bereitschaftseinsatz
           package: ZHR_XSS_FIORI
           transport: DHRK914575

@@ -1,0 +1,77 @@
+<mvc:View controllerName="zbereitschaftseinsatz.controller.View1"
+    xmlns:mvc="sap.ui.core.mvc" displayBlock="true"
+    xmlns="sap.m">
+    <Page id="page" title="{i18n>title}">
+        <content>
+            <MessageStrip id="mStrip" text="{js>/message/errorMsg}" type="{js>/message/errorType}" visible="{= !!${js>/message/visible} }" />
+            <VBox>
+                <HBox>
+                    <Label text=" " width="16px"/>
+                    <Label class="labelWithMargin" text="{i18n>lbdp1}" width="120px" />
+                    <DatePicker id="startDatePicker" value="{path:'js>/newEntry/startDate',type: 'sap.ui.model.odata.type.DateTime', formatOptions: {pattern: 'dd.MM.yyyy', strictParsing: true, UTC: true}}" displayFormat="dd.MM.yyyy" placeholder="{i18n>lbdp1}" valueState="{= ${js>/newEntry/startDateVs} ? 'None' : 'Error'}" valueStateText="{i18n>fieldreq}"/>
+                    <Label text=" " width="16px"/>
+                    <Label class="labelWithMargin" text="{i18n>lbtp1}" width="120px" labelFor="startTimePicker"/>
+                    <TimePicker id="startTimePicker" placeholder="{i18n>lbtp1}" change="handleStarttimeChange" value="{ path: 'js>/newEntry/startTime', type: 'sap.ui.model.type.Time', formatOptions: { pattern: 'HH:mm' }}" valueState="{= ${js>/newEntry/startTimeVs} ? 'None' : 'Error'}" valueStateText="{i18n>fieldreq}"/>
+                </HBox>
+                <HBox>
+                    <Label text=" " width="16px"/>
+                    <Label class="labelWithMargin" text="{i18n>lbdp2}" width="120px" />
+                    <DatePicker id="endDatePicker" value="{path:'js>/newEntry/endDate',type: 'sap.ui.model.odata.type.DateTime', formatOptions: {pattern: 'dd.MM.yyyy', strictParsing: true, UTC: true}}" displayFormat="dd.MM.yyyy" placeholder="{i18n>lbdp2}" valueState="{= ${js>/newEntry/endDateVs} ? 'None' : 'Error'}" valueStateText="{i18n>fieldreq}" />
+                    <Label text=" " width="16px"/>
+                    <Label class="labelWithMargin" text="{i18n>lbtp2}" width="120px" />
+                    <TimePicker id="endTimePicker" placeholder="{i18n>lbtp2}" change="handleEndtimeChange" value="{ path: 'js>/newEntry/endTime', type: 'sap.ui.model.type.Time', formatOptions: { pattern: 'HH:mm' } }" valueState="{= ${js>/newEntry/endTimeVs} ? 'None' : 'Error'}" valueStateText="{i18n>fieldreq}"/>
+                </HBox>
+                <HBox>
+                    <Label text=" " width="16px"/>
+                    <Label class="labelWithMargin" text="{i18n>lbreasonTxt}" width="120px" />
+                    <!-- <Input id="reasonInput" placeholder="Reason for recording" width="202px" /> -->
+                    <TextArea id="TextAreaWarning" value="{js>/newEntry/reasonText}" placeholder="{i18n>phreasonTxt}" rows="4" width="115%" ariaLabelledBy="TextAreaWarningLabel" valueState="{= ${js>/newEntry/reasonTextVs} ? 'None' : 'Error'}" valueStateText="{i18n>fieldreq}"/>
+                </HBox>
+            </VBox>
+
+            <Toolbar>
+                <Button text="{i18n>addbtntxt}" type="Accept" icon="sap-icon://SAP-icons-TNT/sub-process-marker" width="120px" press="onAddButtonPress" />
+                <Button text="{i18n>clrbtntxt}" type="Reject" icon="sap-icon://decline" width="120px" press="onClearButtonPress" />
+            </Toolbar>
+
+            <OverflowToolbar id="otbFooter">
+                <ToolbarSpacer />
+                <Toolbar id="tableToolbar">
+                    <Button text="{i18n>mdfbtntxt}" icon="sap-icon://edit" press="onModifyButtonPress" />
+                    <Button text="{i18n>delbtntxt}" icon="sap-icon://delete" press="onDeleteButtonPress" />
+                    <Button text="{i18n>copybtntxt}" icon="sap-icon://copy" press="onCopyButtonPress" />
+                </Toolbar>
+            </OverflowToolbar>
+            <Table id="reqTable" items="{js>/requests}" mode="MultiSelect" selectionChange="onTableSelectionChange">
+                <columns>
+                    <Column>
+                        <Label text="{i18n>tableclmn1}" />
+                    </Column>
+                    <Column>
+                        <Label text="{i18n>tableclmn2}" />
+                    </Column>
+                    <Column>
+                        <Label text="{i18n>tableclmn3}" />
+                    </Column>
+                    <Column>
+                        <Label text="{i18n>tableclmn4}" />
+                    </Column>
+                    <Column>
+                        <Label text="{i18n>tableclmn5}" />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem>
+                        <cells>
+                            <Text text="{ path: 'js>startDate', type: 'sap.ui.model.type.DateTime', formatOptions: { pattern: 'dd.MM.yyyy' } }" />
+                            <Text text="{ path: 'js>endDate', type: 'sap.ui.model.type.DateTime', formatOptions: { pattern: 'dd.MM.yyyy' } }" />
+                            <Text text="{ path: 'js>startTime', type: 'sap.ui.model.odata.type.Time', formatOptions: { pattern: 'HH:mm:ss' } }" />
+                            <Text text="{ path: 'js>endTime', type: 'sap.ui.model.odata.type.Time', formatOptions: { pattern: 'HH:mm:ss' } }" />
+                            <Text text="{js>reasonText}" />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+    </Page>
+</mvc:View>

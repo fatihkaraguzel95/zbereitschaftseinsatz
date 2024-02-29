@@ -1,0 +1,21 @@
+{ 
+    "requests": [],
+    "newEntry": { 
+        "startDate":"",
+        "startDateVs": true,
+        "endDate":"",
+        "endDateVs": true,
+        "startTime":"",
+        "startTimeVs": true,
+        "endTime":"",
+        "endTimeVs": true,
+        "reasonText":"",
+        "reasonTextVs": true
+    },
+    "pernr": "",
+    "message": {
+        "errorMsg": "",
+        "errorType": "Error",
+        "visible": false
+    }
+}

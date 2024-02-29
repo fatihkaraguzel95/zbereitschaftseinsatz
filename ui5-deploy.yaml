@@ -13,12 +13,13 @@ builder:
     - name: deploy-to-abap
       afterTask: generateCachebusterInfo
       configuration:
+        ignoreCertError: false
         target:
-          url: https://172.16.225.9:8201
+          url: https://sapdev1.porta.de:8201
         app:
-          name: ZHR_XSS_BEREITSCHAFT
+          name: ZHR_FIO_BEREITS
           description: Bereitschaftseinsatz
           package: ZHR_XSS_FIORI
-          transport: DHRK914574
+          transport: DHRK914575
         exclude:
           - /test/
